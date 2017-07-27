@@ -18,6 +18,12 @@ class BackendController extends ActionController
     protected $settingsRepository;
 
     /**
+     * @Flow\InjectConfiguration(package="CM.Neos.ThemeModule")
+     * @var array
+     */
+    protected $configuration;
+
+    /**
      * @Flow\Inject
      * @var Build
      */
@@ -51,11 +57,12 @@ class BackendController extends ActionController
 
         $fonts = $this->buildService->buildFontOptions();
 
-        $this->view->assignMultiple(array(
+        $this->view->assignMultiple([
+            'configuration' => $this->configuration,
             'settings' => $activeSettings,
             'themeSettings' => $themeSettings,
             'fonts' => $fonts
-        ));
+        ]);
     }
 
     /**

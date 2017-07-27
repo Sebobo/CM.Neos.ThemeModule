@@ -61,6 +61,10 @@ CM:
         outputPath: 'resource://Vendor.Site.Package/Public/Styles/'
         outputFilename: 'Main.css'
 
+        # Options for the backend module
+        allowCustomCssCode: true
+        allowCustomScssCode: true
+
         # Define your default scss variable value
         # You can add/remove values to this list
         # The order: BE module values, Settings.yaml values, scss file defined value

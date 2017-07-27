@@ -14,16 +14,20 @@
 			</f:for>
 
 			<!-- Custom SCSS / CSS input -->
-			<div class="row">
-				<h2>{neos:backend.translate(id: 'textarea.scss.label', package: 'CM.Neos.ThemeModule')}</h2>
-				<!-- Custom scss to append -->
-				<f:form.textarea property="customScss" id="code-scss" rows="10" cols="70"/><br />
-			</div>
-			<div class="row">
-				<h2>{neos:backend.translate(id: 'textarea.css.label', package: 'CM.Neos.ThemeModule')}</h2>
-				<!-- Custom css code to append -->
-				<f:form.textarea property="customCss" id="code-css" rows="10" cols="70" /><br />
-			</div>
+			<f:if condition="{configuration.scss.allowCustomScssCode}">
+				<div class="row">
+					<h2>{neos:backend.translate(id: 'textarea.scss.label', package: 'CM.Neos.ThemeModule')}</h2>
+					<!-- Custom scss to append -->
+					<f:form.textarea property="customScss" id="code-scss" rows="10" cols="70"/><br />
+				</div>
+			</f:if>
+			<f:if condition="{configuration.scss.allowCustomCssCode}">
+				<div class="row">
+					<h2>{neos:backend.translate(id: 'textarea.css.label', package: 'CM.Neos.ThemeModule')}</h2>
+					<!-- Custom css code to append -->
+					<f:form.textarea property="customCss" id="code-css" rows="10" cols="70" /><br />
+				</div>
+			</f:if>
 
 			<div class="row">
 				<button type="submit" title="{neos:backend.translate(id: 'button.save', package: 'CM.Neos.ThemeModule')}" data-neos-toggle="tooltip"><i class="icon-refresh"></i> {neos:backend.translate(id: 'button.save', package: 'CM.Neos.ThemeModule')}</button>
