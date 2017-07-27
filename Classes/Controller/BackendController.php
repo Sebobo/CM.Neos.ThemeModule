@@ -8,6 +8,8 @@ use Neos\Flow\Cache\CacheManager;
 use Neos\Flow\Mvc\Controller\ActionController;
 use CM\Neos\ThemeModule\Domain\Model\Settings;
 use CM\Neos\ThemeModule\Domain\Repository\SettingsRepository;
+use Neos\Neos\Domain\Model\Site;
+use Neos\Neos\Domain\Repository\SiteRepository;
 
 class BackendController extends ActionController
 {
@@ -16,6 +18,12 @@ class BackendController extends ActionController
      * @var SettingsRepository
      */
     protected $settingsRepository;
+
+    /**
+     * @Flow\Inject
+     * @var SiteRepository
+     */
+    protected $siteRepository;
 
     /**
      * @Flow\InjectConfiguration(package="CM.Neos.ThemeModule")
@@ -53,11 +61,14 @@ class BackendController extends ActionController
             $activeSettings = new Settings();
         }
 
+        $sites = $this->siteRepository->findOnline();
+
         $themeSettings = $this->buildService->buildThemeSettings();
 
         $fonts = $this->buildService->buildFontOptions();
 
         $this->view->assignMultiple([
+            'sites' => $sites,
             'configuration' => $this->configuration,
             'settings' => $activeSettings,
             'themeSettings' => $themeSettings,
@@ -70,8 +81,9 @@ class BackendController extends ActionController
      *
      * @param Settings $settings Custom theme setting object
      * @param array $customSettings Custom settings for the theme
+     * @param Site $site for which the theme should be configured
      */
-    public function updateAction(Settings $settings, $customSettings = array())
+    public function updateAction(Settings $settings, $customSettings = [], Site $site = null)
     {
         $settings->setCustomSettings(json_encode($customSettings));
 
@@ -81,7 +93,7 @@ class BackendController extends ActionController
             $this->settingsRepository->update($settings);
         }
 
-        $this->compile->compileScss($settings, $customSettings);
+        $this->compile->compileScss($settings, $customSettings, $site);
 
         // Make sure all page caches get flushed
         $this->cacheManager->flushCachesByTag('DescendantOf_' . strtr('Neos.Neos:Page', '.:', '_-'), true);

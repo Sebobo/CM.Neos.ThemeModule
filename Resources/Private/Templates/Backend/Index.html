@@ -9,6 +9,9 @@
 		</div>
 		<f:form action="update" method="post" class="neos-button-primary" object="{settings}" name="settings">
 
+			Site
+			<f:form.select options="{sites}" name="site"/>
+
 			<f:for each="{themeSettings}" as="group" key="groupKey">
 				<f:render section="group" arguments="{group: group, groupKey: groupKey, fonts: fonts}" />
 			</f:for>

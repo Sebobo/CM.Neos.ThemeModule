@@ -2,6 +2,9 @@
 namespace CM\Neos\ThemeModule\Service;
 
 use Leafo\ScssPhp\Compiler;
+use Neos\Eel\CompilingEvaluator;
+use Neos\Eel\Utility;
+use Neos\Neos\Domain\Model\Site;
 use Neos\Utility\Unicode\Functions;
 use CM\Neos\ThemeModule\Domain\Model\Font;
 use Neos\Flow\Annotations as Flow;
@@ -39,12 +42,19 @@ class Compile
     protected $buildService;
 
     /**
+     * @Flow\Inject
+     * @var CompilingEvaluator
+     */
+    protected $eelEvaluator;
+
+    /**
      * Compile scss to css and add custom scss/css
      *
      * @param Settings $settings current settings
      * @param array $customSettings current custom settings
+     * @param Site $site allows specifying a site to modify options in multi-site setups
      */
-    public function compileScss(Settings $settings, $customSettings)
+    public function compileScss(Settings $settings, $customSettings, Site $site = null)
     {
 
         $scssVars = array();
@@ -116,14 +126,36 @@ class Compile
                 $compiledCss = $compiledCss . "\n" . $settings->getCustomCss();
             }
 
-            FileUtility::writeStaticFile($this->configuration['scss']['outputPath'],
-                $this->configuration['scss']['outputFilename'], $compiledCss);
+            FileUtility::writeStaticFile(
+                $this->getParsedConfigurationParameter($this->configuration['scss']['outputPath'], $site),
+                $this->getParsedConfigurationParameter($this->configuration['scss']['outputFilename'], $site),
+                $compiledCss);
 
             $this->systemLogger->log('Scss successfully compiled');
 
         } catch (\Exception $e) {
             $this->systemLogger->logException($e, array('message' => 'Compiling scss was not successful'));
         }
+    }
+
+    /**
+     * Evaluates input as eel expressions and returns the result
+     *
+     * @param $value
+     * @param Site|null $site
+     * @return mixed
+     */
+    protected function getParsedConfigurationParameter($value, Site $site = null)
+    {
+        if (is_string($value)) {
+            $parameters = array_merge([], ['site' => $site]);
+            try {
+                return Utility::evaluateEelExpression($value, $this->eelEvaluator, $parameters);
+            } catch (\Exception $e) {
+
+            }
+        }
+        return $value;
     }
 
     /**
